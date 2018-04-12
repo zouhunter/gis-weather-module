@@ -1,16 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
+using UnityEngine.UI;
+using UnityEngine;
 
 namespace Weather
 {
-    public partial class WeatherDayMore : UserControl
+    public class WeatherDayMore : MonoBehaviour
     {
-        public WeatherDayMore()
+        [SerializeField]
+        private Text labelDay;
+        [SerializeField]
+        private Text labelInfo;
+        [SerializeField]
+        private Text labelTemp;
+        [SerializeField]
+        private Text labelWind1;
+        [SerializeField]
+        private Text labelWind2;
+        [SerializeField]
+        private RawImage pictureBoxWeather;
+        public void Awake()
         {
             InitializeComponent();
+        }
+
+        private void InitializeComponent()
+        {
+
         }
 
         string day;
@@ -22,7 +39,7 @@ namespace Weather
             set
             {
                 this.day = value;
-                this.labelDay.Text = this.day;
+                this.labelDay.text = this.day;
             }
             get
             {
@@ -38,7 +55,7 @@ namespace Weather
             set
             {
                 this.info = value;
-                this.labelInfo.Text = this.info;
+                this.labelInfo.text = this.info;
             }
             get
             {
@@ -54,7 +71,7 @@ namespace Weather
             set
             {
                 this.temperature = value;
-                this.labelTemp.Text = this.temperature;
+                this.labelTemp.text = this.temperature;
             }
             get
             {
@@ -64,6 +81,7 @@ namespace Weather
 
 
         string wind1;
+
         [Category("设置")]
         [Description("设置或获得风级1")]
         [DefaultValue("")]
@@ -72,7 +90,7 @@ namespace Weather
             set
             {
                 this.wind1 = value;
-                this.labelWind1.Text = this.wind1;
+                this.labelWind1.text = this.wind1;
             }
             get
             {
@@ -89,7 +107,7 @@ namespace Weather
             set
             {
                 this.wind2 = value;
-                this.labelWind2.Text = this.wind2;
+                this.labelWind2.text = this.wind2;
             }
             get
             {
@@ -106,7 +124,7 @@ namespace Weather
             set
             {
                 this.status = value;
-                this.pictureBoxWeather.ImageLocation = this.GetSmallWeatherStatusString(this.status);
+                StartCoroutine(ChargePicture( pictureBoxWeather, this.GetSmallWeatherStatusString(this.status)));
             }
             get
             {
@@ -165,6 +183,16 @@ namespace Weather
                 default: url += "nothing.gif"; break;
             }
             return url;
+        }
+
+        IEnumerator ChargePicture(RawImage image,string url)
+        {
+            WWW www = new WWW(url);
+            yield return url;
+            if(www.error != null)
+            {
+                image.texture = www.texture;
+            }
         }
     }
 }

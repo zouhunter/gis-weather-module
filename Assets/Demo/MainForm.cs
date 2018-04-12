@@ -1,161 +1,257 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+using UnityEngine;
+using UnityEngine.UI;
 using System.Reflection;
 using System.IO;
+using System.Threading;
 
 namespace Weather
 {
-    public partial class MainForm : Form
+    public class MainForm : MonoBehaviour
     {
-        public MainForm()
+        [SerializeField]
+        private Dropdown comboBoxProvince;
+        [SerializeField]
+        private Dropdown comboBoxCity;
+        [SerializeField]
+        private Dropdown comboBoxDistrict;
+        [SerializeField]
+        private Text lblVerson;
+        [SerializeField]
+        private Text lblStatus;
+        [SerializeField]
+        private Button buttonAbout;
+        [SerializeField]
+        private Button buttonSearch;
+        [SerializeField][Header("7个")]
+        private WeatherDay[] weatherDays;//7 个
+        [SerializeField][Header("8个")]
+        private WeatherDayMore[] weatherDaysMore;
+
+        Queue<Action> actionQueue = new Queue<Action>();
+        PlaceModel[] provinces;
+        PlaceModel[] citys;
+        PlaceModel[] districts;
+        public void Awake()
         {
             InitializeComponent();
+            MainForm_Load();
         }
-
-
-        public void InvokeToForm(Action action) => this.Invoke(action);
-        public void BeginInvokeToForm(Action action) => this.BeginInvoke(action);
-        private void BindProvince()
+        private void Update()
         {
-            this.InvokeToForm(() => 
+            if (actionQueue.Count > 0)
             {
-                comboBoxProvince.ComboBox.ValueMember = "ID";
-                comboBoxProvince.ComboBox.DisplayMember = "Name";
-            });
-            PlaceModel[] provinces = Place.GetProvinces();
-            if(provinces != null)
-            {
-                this.InvokeToForm(() => comboBoxProvince.ComboBox.DataSource = provinces);
+                var action = actionQueue.Dequeue();
+                if (action != null)
+                {
+                    action.Invoke();
+                }
             }
         }
-        
+
+        private void InitializeComponent()
+        {
+            buttonAbout.onClick.AddListener(buttonAbout_Click);
+            comboBoxProvince.onValueChanged.AddListener(ComboBoxProvince_SelectedIndexChanged);
+            comboBoxCity.onValueChanged.AddListener(ComboBoxCity_SelectedIndexChanged);
+            comboBoxDistrict.onValueChanged.AddListener(ComboBoxDistrict_SelectedIndexChanged);
+            buttonSearch.onClick.AddListener(buttonSearch_Click);
+        }
+        public void InvokeToForm(Action action)
+        {
+            actionQueue.Enqueue(action);
+        }
+
+        private void BindProvince()
+        {
+            provinces = Place.GetProvinces();
+
+            if (provinces != null)
+            {
+                this.InvokeToForm(() =>
+                {
+                    comboBoxProvince.ClearOptions();
+                    var list = new List<Dropdown.OptionData>();
+                    foreach (var item in provinces)
+                    {
+                        var option = new Dropdown.OptionData();
+                        option.text = item.Name;
+                        list.Add(option);
+                    }
+                    comboBoxProvince.AddOptions(list);
+                    if (comboBoxProvince.value != 0)
+                    {
+                        comboBoxProvince.value = 0;
+                    }
+                    else
+                    {
+                        ComboBoxProvince_SelectedIndexChanged(0);
+                    }
+                });
+            }
+        }
+
         private void BindCity()
         {
-            PlaceModel city = null;
-            this.InvokeToForm(() => 
+            if (provinces == null || provinces.Length == 0) return;
+          
+            PlaceModel province = provinces[comboBoxProvince.value];
+            if (province != null)
             {
-                comboBoxCity.ComboBox.ValueMember = "ID";
-                comboBoxCity.ComboBox.DisplayMember = "Name";
-                city = comboBoxProvince.ComboBox.SelectedItem as PlaceModel;
-            });
-            if(city != null)
-            {
-                PlaceModel[] citys = Place.GetCitys(city);
-                this.InvokeToForm(() => comboBoxCity.ComboBox.DataSource = citys);
+                citys = Place.GetCitys(province);
+
+                this.InvokeToForm(() =>
+                {
+                    comboBoxCity.ClearOptions();
+
+                    var list = new List<Dropdown.OptionData>();
+                    foreach (var item in citys)
+                    {
+                        var option = new Dropdown.OptionData();
+                        option.text = item.Name;
+                        list.Add(option);
+                    }
+                    comboBoxCity.AddOptions(list);
+                    if(comboBoxCity.value != 0)
+                    {
+                        comboBoxCity.value = 0;
+                    }
+                    else
+                    {
+                        ComboBoxCity_SelectedIndexChanged(0);
+                    }
+                });
             }
         }
 
         private void BindDistrict()
         {
-            PlaceModel province = null;
-            PlaceModel city = null;
-            this.InvokeToForm(() =>
+            if (provinces == null || provinces.Length == 0) return;
+            if (citys == null || citys.Length == 0) return;
+
+            PlaceModel province = provinces[comboBoxProvince.value];
+            PlaceModel city = citys[comboBoxCity.value];
+
+            if (province != null && city != null)
             {
-                comboBoxDistrict.ComboBox.ValueMember = "ID";
-                comboBoxDistrict.ComboBox.DisplayMember = "Name";
-                province = comboBoxProvince.ComboBox.SelectedItem as PlaceModel;
-                city = comboBoxCity.ComboBox.SelectedItem as PlaceModel;
-            });
-            if(province != null && city != null)
-            {
-                PlaceModel[] districts = Place.GetDistricts(province, city);
-                this.InvokeToForm(() => comboBoxDistrict.ComboBox.DataSource = districts);
+                districts = Place.GetDistricts(province, city);
+                this.InvokeToForm(() =>
+                {
+                    var list = new List<Dropdown.OptionData>();
+                    comboBoxDistrict.ClearOptions();
+                    foreach (var item in districts)
+                    {
+                        var option = new Dropdown.OptionData();
+                        option.text = item.Name;
+                        list.Add(option);
+                    }
+                    comboBoxDistrict.AddOptions(list);
+                    if (comboBoxDistrict.value != 0)
+                    {
+                        comboBoxDistrict.value = 0;
+                    }
+                    else
+                    {
+                        ComboBoxDistrict_SelectedIndexChanged(0);
+                    }
+                });
             }
             else
             {
-                this.InvokeToForm(() => lblStatus.Text = "地区加载错误，请确保联网正确");
+                this.InvokeToForm(() => lblStatus.text = "地区加载错误，请确保联网正确");
             }
         }
 
-        private void MainForm_Load(object sender, EventArgs e)
+        private void MainForm_Load()
         {
-            lblVerson.Text = $"版本：{Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
-            lblStatus.Text = "数据加载中";
-            BindMenu();
-            Task.Factory.StartNew(() => 
-            {
+            lblVerson.text = "版本：" + Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            lblStatus.text = "数据加载中";
+
+            ThreadPool.QueueUserWorkItem(new WaitCallback((x) => {
                 BindProvince();
-                BindCity();
-                BindDistrict();
-                this.BeginInvokeToForm(() => {
-                    if(areas!= null && areas.Areas!= null && areas.Areas.Length >0)
-                    {
-                        comboBoxProvince.SelectedItem = areas.Areas[0].Province;
-                        comboBoxCity.SelectedItem = areas.Areas[0].City;
-                        comboBoxDistrict.SelectedItem = areas.Areas[0].District;
-                    }
-                    buttonSearch.PerformClick();
-                });
-            }).ContinueWith(t=> 
-            {
-                if(t.IsFaulted)
-                {
-                    this.InvokeToForm(() => lblStatus.Text = "地区加载错误，请确保联网正确");
-                }
-            });
-            
+            }), null);
         }
 
-        private void ComboBoxProvince_SelectedIndexChanged(object sender, EventArgs e)
+        private void ComboBoxProvince_SelectedIndexChanged(int id)
         {
-             BindCity();
+            BindCity();
         }
 
-        private void comboBoxCity_SelectedIndexChanged(object sender, EventArgs e)
+        private void ComboBoxCity_SelectedIndexChanged(int id)
         {
             BindDistrict();
         }
-
-        private void buttonSearch_Click(object sender, EventArgs e)
+        private void ComboBoxDistrict_SelectedIndexChanged(int id)
         {
-            PlaceModel province = null, city= null, district = null;
-            this.InvokeToForm(() =>
+            buttonSearch_Click();
+        }
+        
+        private void buttonSearch_Click()
+        {
+            PlaceModel province = null, city = null, district = null;
+            
+            if(provinces != null &&  provinces.Length > comboBoxProvince.value)
             {
-                province = this.comboBoxProvince.ComboBox.SelectedItem as PlaceModel;
-                city = this.comboBoxCity.ComboBox.SelectedItem as PlaceModel;
-                district = this.comboBoxDistrict.ComboBox.SelectedItem as PlaceModel;
-            });
-            if(province != null && city != null && district != null)
+                province = provinces[comboBoxProvince.value];
+            }
+
+            if (citys != null && citys.Length > comboBoxCity.value)
             {
-                this.InvokeToForm(() =>lblStatus.Text = "查询中");
-                Task.Factory.StartNew(() =>
-                {
-                    WeatherDetail detail = this.Search(province, city, district);
-                    this.Invoke(new Action(() =>
-                    {
-                        this.SetWeather(detail);
-                        lblStatus.Text = "已完成";
-                    }));
-                }).ContinueWith(t=> 
-                {
-                    if(t.IsFaulted)
-                    {
-                        this.InvokeToForm(() =>lblStatus.Text = "查询错误，请确保联网正确");
-                    }
+                city = citys[comboBoxCity.value];
+            }
+           
+            if(districts != null && districts.Length > comboBoxDistrict.value)
+            {
+                district = districts[comboBoxDistrict.value];
+            }
+
+            if (province != null && city != null && district != null)
+            {
+                this.InvokeToForm(() => {
+                    lblStatus.text = "查询中";
+                    province = provinces[comboBoxProvince.value];
+                    city = citys[comboBoxCity.value];
+                    district = districts[comboBoxDistrict.value];
+                    ThreadPool.QueueUserWorkItem((x)=> {
+                        WeatherDetail detail = this.Search(province, city, district);
+                        Debug.Log(detail);
+                        Debug.Log(detail.city);
+                        this.InvokeToForm(new Action(() =>
+                        {
+                            if(detail != null)
+                            {
+                                this.SetWeather(detail);
+                                lblStatus.text = "已完成";
+                            }
+                            else
+                            {
+                                lblStatus.text = "查询错误，请确保联网正确";
+                            }
+                          
+                        }));
+                    },null);
                 });
+            }
+            else
+            {
+                lblStatus.text = "地区加载错误，请确保联网正确";
             }
         }
 
         private void SetWeather(WeatherDetail detail)
         {
-            WeatherDay[] weatherDays = new WeatherDay[] { weatherDay1, weatherDay2, weatherDay3, weatherDay4, weatherDay5, weatherDay6, weatherDay7 };
-            for(int i=0;i<weatherDays.Length;i++)
+            Debug.Assert(detail != null,"detail == null");
+            for (int i = 0; i < weatherDays.Length; i++)
             {
-                weatherDays[i].Day = detail.Day_1To7[i]??"";
+                weatherDays[i].Day = detail.Day_1To7[i] ?? "";
                 weatherDays[i].Info = detail.Info_1To7[i] ?? "";
                 weatherDays[i].Temperature = detail.Temperature_1To7[i] ?? "";
                 weatherDays[i].Wind = detail.Wind_1To7[i] ?? "";
-                weatherDays[i].WeatherStatus =detail.WeatherStatus_1To7[i];
+                weatherDays[i].WeatherStatus = detail.WeatherStatus_1To7[i];
             }
-            WeatherDayMore[] weatherDaysMore = new WeatherDayMore[] { weatherDayMore1, weatherDayMore2, weatherDayMore3, weatherDayMore4, weatherDayMore5, weatherDayMore6, weatherDayMore7, weatherDayMore8 };
-            for (int i = 0; i < weatherDaysMore.Length; i++)
+             for (int i = 0; i < weatherDaysMore.Length; i++)
             {
                 weatherDaysMore[i].Day = detail.Day_7To15[i] ?? "";
                 weatherDaysMore[i].Info = detail.Info_7To15[i] ?? "";
@@ -173,82 +269,9 @@ namespace Weather
             return detail;
         }
 
-        private void buttonAbout_Click(object sender, EventArgs e)
+        private void buttonAbout_Click()
         {
-            MessageBox.Show($"天气预报\r\n版本：{Assembly.GetExecutingAssembly().GetName().Version.ToString()}\r\n作者QQ：494345105\r\nEmail:cnc46@qq.com","信息",MessageBoxButtons.OK,MessageBoxIcon.Information);
-        }
-        string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "weather.xml");
-        AreaCollection areas;
-        private void BindMenu()
-        {
-            buttonCustom.DropDownItems.Clear();
-            //ToolStripMenuItem
-            areas = XmlOperator.Deserialize<AreaCollection>(path);
-            if(areas != null)
-            {
-                for(int i=0;i<areas.Areas.Length;i++)
-                {
-                    ToolStripMenuItem toolStripMenuItem = new ToolStripMenuItem
-                    {
-                        Name = $"toolStripMenuItem_{areas.Areas[i].Province.Name}_{areas.Areas[i].City.Name}_{areas.Areas[i].District.Name}",
-                        Text = areas.Areas[i].Name,
-                        Tag = areas.Areas[i]
-                    };
-                    toolStripMenuItem.Click += (s, o) => 
-                    {
-                        ToolStripMenuItem _toolStripMenuItem = (ToolStripMenuItem)s;
-                        Area area = (Area)_toolStripMenuItem.Tag;
-                        comboBoxProvince.SelectedItem = area.Province;
-                        comboBoxCity.SelectedItem = area.City;
-                        comboBoxDistrict.SelectedItem = area.District;
-                        buttonSearch.PerformClick();
-                    };
-                    buttonCustom.DropDownItems.Add(toolStripMenuItem);
-                }
-            }
-            else
-            {
-                areas = new AreaCollection();
-            }
-            buttonCustom.DropDownItems.Add(new ToolStripSeparator());
-            ToolStripMenuItem toolStripMenuItem1 = new ToolStripMenuItem()
-            {
-                Name = "toolStripMenuItem_AddCity",
-                Text = "添加城市",
-            };
-            toolStripMenuItem1.Click += (s, o) =>
-            {
-                PlaceModel province = comboBoxProvince.ComboBox.SelectedItem as PlaceModel;
-                PlaceModel city = comboBoxCity.ComboBox.SelectedItem as PlaceModel;
-                PlaceModel district = comboBoxDistrict.ComboBox.SelectedItem as PlaceModel;
-                if(province != null && city != null && district != null)
-                { 
-                    areas.Add(new Area() { Name = district.Name, Province = province, City = city, District = district });
-                    XmlOperator.Serialize(path,areas);
-                    BindMenu();
-                }
-            };
-            buttonCustom.DropDownItems.Add(toolStripMenuItem1);
-
-
-            ToolStripMenuItem toolStripMenuItem2 = new ToolStripMenuItem()
-            {
-                Name = "toolStripMenuItem_DeleteCity",
-                Text = "删除城市",
-            };
-            toolStripMenuItem2.Click += (s, o) =>
-            {
-                PlaceModel province = comboBoxProvince.ComboBox.SelectedItem as PlaceModel;
-                PlaceModel city = comboBoxCity.ComboBox.SelectedItem as PlaceModel;
-                PlaceModel district = comboBoxDistrict.ComboBox.SelectedItem as PlaceModel;
-                if (province != null && city != null && district != null)
-                {
-                    areas.Remove(new Area() { Name = district.Name, Province = province, City = city, District = district });
-                    XmlOperator.Serialize(path, areas);
-                    BindMenu();
-                }
-            };
-            buttonCustom.DropDownItems.Add(toolStripMenuItem2);
+            MessageBox.Show("关于", "天气预报\r\n版本：" + Assembly.GetExecutingAssembly().GetName().Version.ToString());
         }
     }
 }

@@ -15,12 +15,12 @@ namespace Weather
 
         public static PlaceModel[] GetCitys(PlaceModel province)
         {
-            return GetPlaceList(@"http://www.weather.com.cn/data/city3jdata/provshi/{province.ID}.html");
+            return GetPlaceList(string.Format("http://www.weather.com.cn/data/city3jdata/provshi/{0}.html", province.ID));
         }
 
         public static PlaceModel[] GetDistricts(PlaceModel province,PlaceModel city)
         {
-            return GetPlaceList(@"http://www.weather.com.cn/data/city3jdata/station/{province.ID}{city.ID}.html");
+            return GetPlaceList(string.Format("http://www.weather.com.cn/data/city3jdata/station/{0}{1}.html",province.ID,city.ID));
         }
 
         static PlaceModel[] GetPlaceList(string url)

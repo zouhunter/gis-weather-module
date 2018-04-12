@@ -34,18 +34,18 @@ namespace Weather
         {
             using (WebClient webClient = new WebClient() { Encoding = Encoding.UTF8})
             {
-                string url = @"http://www.weather.com.cn/weather/";
+                string url = "http://www.weather.com.cn/weather/";
                 if (city.ID == "00")
                 {
-                    url += @"{province.ID}{district.ID}{city.ID}.shtml";
+                    url += string.Format("{0}{1}{2}.shtml", province.ID, district.ID, city.ID);
                 }
                 else if (district.ID.Length >2)
                 {
-                    url += @"{district.ID}.shtml";
+                    url += string.Format("{0}.shtml", district.ID);
                 }
                 else 
                 {
-                    url += @"{province.ID}{city.ID}{district.ID}.shtml";
+                    url += string.Format("{0}{1}{2}.shtml", province.ID, city.ID, district.ID);
                 }
                  
                 byte [] contentBytes = webClient.DownloadData(url);
@@ -100,7 +100,7 @@ namespace Weather
                                 matches_temp = Regex.Matches(match.Value, "<i>.*?</i>");
                                 if (matches_temp.Count >= 1)
                                 {
-                                    temperature = string.IsNullOrEmpty(temperature) ? RemoveAngleBrackets(matches_temp[0].Value) : @"{temperature}/{RemoveAngleBrackets(matches_temp[0].Value)}";
+                                    temperature = string.IsNullOrEmpty(temperature) ? RemoveAngleBrackets(matches_temp[0].Value) : string.Format("{0}/{1}",temperature,RemoveAngleBrackets(matches_temp[0].Value));
                                 }
                                 if(matches_temp.Count >= 2)
                                 {
@@ -119,18 +119,18 @@ namespace Weather
                 }
 
                 //More
-                url = @"http://www.weather.com.cn/weather15d/";
+                url = "http://www.weather.com.cn/weather15d/";
                 if (city.ID == "00")
                 {
-                    url += @"{province.ID}{district.ID}{city.ID}.shtml";
+                    url += string.Format("{0}{1}{2}.shtml", province.ID, district.ID, city.ID);
                 }
                 else if (district.ID.Length > 2)
                 {
-                    url += @"{district.ID}.shtml";
+                    url += string.Format("{0}.shtml",district.ID);
                 }
                 else
                 {
-                    url += @"{province.ID}{city.ID}{district.ID}.shtml";
+                    url += string.Format("{0}{1}{2}.shtml", province.ID, city.ID, district.ID);
                 }
 
                 contentBytes = webClient.DownloadData(url);

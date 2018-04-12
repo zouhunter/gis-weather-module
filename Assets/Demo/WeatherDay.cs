@@ -3,16 +3,31 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using System.Collections;
 using System.Collections.Generic;
+using System;
+using System.ComponentModel;
 
 namespace Weather
 {
-
     [DefaultProperty("Day")]
-    public partial class WeatherDay : UserControl
+    public class WeatherDay : MonoBehaviour
     {
-        public WeatherDay()
+        [SerializeField]
+        private Text labelDay;
+        [SerializeField]
+        private Text labelInfo;
+        [SerializeField]
+        private Text labelTemp;
+        [SerializeField]
+        private Text labelWind;
+        [SerializeField]
+        private RawImage pictureBoxWeather;
+        public void Awake()
         {
             InitializeComponent();
+        }
+
+        private void InitializeComponent()
+        {
         }
 
         string day;
@@ -24,7 +39,7 @@ namespace Weather
             set
             {
                 this.day = value;
-                this.labelDay.Text = this.day;
+                this.labelDay.text = this.day;
             }
             get
             {
@@ -40,7 +55,7 @@ namespace Weather
             set
             {
                 this.info = value;
-                this.labelInfo.Text = this.info;
+                this.labelInfo.text = this.info;
             }
             get
             {
@@ -56,7 +71,7 @@ namespace Weather
             set
             {
                 this.temperature = value;
-                this.labelTemp.Text = this.temperature;
+                this.labelTemp.text = this.temperature;
             }
             get
             {
@@ -74,7 +89,7 @@ namespace Weather
             set
             {
                 this.wind = value;
-                this.labelWind.Text = this.wind;
+                this.labelWind.text = this.wind;
             }
             get
             {
@@ -91,7 +106,8 @@ namespace Weather
             set
             {
                 this.status = value;
-                this.pictureBoxWeather.ImageLocation = this.GetBigWeatherStatusString(this.status);
+                StartCoroutine(ChargePicture(pictureBoxWeather, this.GetBigWeatherStatusString(this.status)));
+                //this.pictureBoxWeather.ImageLocation = this.GetBigWeatherStatusString(this.status);
             }
             get
             {
@@ -152,7 +168,15 @@ namespace Weather
             return url;
         }
 
-
+        IEnumerator ChargePicture(RawImage image, string url)
+        {
+            WWW www = new WWW(url);
+            yield return url;
+            if (www.error != null)
+            {
+                image.texture = www.texture;
+            }
+        }
     }
 
 }
