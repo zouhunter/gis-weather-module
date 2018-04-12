@@ -219,7 +219,7 @@ public class MainForm : MonoBehaviour
                 district = districts[comboBoxDistrict.value];
                 ThreadPool.QueueUserWorkItem((x) =>
                 {
-                    WeatherDetail detail = this.Search(province, city, district);
+                    WeekWeatherAnalysis detail = this.Search(province, city, district);
                     Debug.Log(detail);
                     Debug.Log(detail.city);
                     this.InvokeToForm(new Action(() =>
@@ -244,7 +244,7 @@ public class MainForm : MonoBehaviour
         }
     }
 
-    private void SetWeather(WeatherDetail detail)
+    private void SetWeather(WeekWeatherAnalysis detail)
     {
         Debug.Assert(detail != null, "detail == null");
         for (int i = 0; i < weatherDays.Length; i++)
@@ -266,9 +266,9 @@ public class MainForm : MonoBehaviour
         }
     }
 
-    private WeatherDetail Search(PlaceModel province, PlaceModel city, PlaceModel district)
+    private WeekWeatherAnalysis Search(PlaceModel province, PlaceModel city, PlaceModel district)
     {
-        WeatherDetail detail = new WeatherDetail(province, city, district);
+        WeekWeatherAnalysis detail = new WeekWeatherAnalysis(province, city, district);
         detail.HandleWeather();
         return detail;
     }

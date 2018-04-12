@@ -8,18 +8,19 @@ using System.Text.RegularExpressions;
 
 namespace Weather
 {
-    class WeatherDetail
+    class WeekWeatherAnalysis
     {
         public PlaceModel province;
         public PlaceModel city;
         public PlaceModel district;
 
-        public WeatherDetail(PlaceModel province,PlaceModel city,PlaceModel district)
+        public WeekWeatherAnalysis(PlaceModel province,PlaceModel city,PlaceModel district)
         {
             this.province = province;
             this.city = city;
             this.district = district;
         }
+
         public string[] Day_1To7 { private set; get; }
         public string[] Day_7To15 { private set; get; }
         public string[] Info_1To7 { private set; get; }
@@ -49,7 +50,7 @@ namespace Weather
                 {
                     url += string.Format("{0}{1}{2}.shtml", province.ID, city.ID, district.ID);
                 }
-                 
+                UnityEngine.Debug.Log(url);
                 byte [] contentBytes = webClient.DownloadData(url);
                 using (MemoryStream stream = new MemoryStream(contentBytes))
                 using(StreamReader reader = new StreamReader(stream))
