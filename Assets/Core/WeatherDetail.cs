@@ -13,6 +13,7 @@ namespace Weather
         public PlaceModel province;
         public PlaceModel city;
         public PlaceModel district;
+
         public WeatherDetail(PlaceModel province,PlaceModel city,PlaceModel district)
         {
             this.province = province;
@@ -30,6 +31,7 @@ namespace Weather
         public string[] Wind2_7To15 { private set; get; }
         public WeatherStatus[] WeatherStatus_1To7 { private set; get; }
         public WeatherStatus[] WeatherStatus_7To15 { private set; get; }
+
         public void HandleWeather()
         {
             using (WebClient webClient = new WebClient() { Encoding = Encoding.UTF8})
@@ -213,7 +215,6 @@ namespace Weather
             result = result.Remove(firstStartIndex, firstEndIndex- firstStartIndex + 1);
             return result;
         }
-
         private WeatherStatus GetWeatherStatus(string weatherInfo)
         {
             switch(weatherInfo)
@@ -263,7 +264,6 @@ namespace Weather
                 default:return WeatherStatus.Weizhi;
             }
         }
-
         private WeatherStatus GetUnkownWeatherStatus(string weatherInfo)
         {
             string result = weatherInfo;

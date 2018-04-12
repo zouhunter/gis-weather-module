@@ -4,7 +4,6 @@ using UnityEngine.Events;
 using System.Collections;
 using System.Collections.Generic;
 using System;
-
 public class MessageBox : MonoBehaviour {
     [SerializeField]
     private Button m_close;

@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System;
 using System.ComponentModel;
 
-namespace Weather
-{
-    [DefaultProperty("Day")]
+using Weather;
+
+[DefaultProperty("Day")]
     public class WeatherDay : MonoBehaviour
     {
         [SerializeField]
@@ -178,5 +178,3 @@ namespace Weather
             }
         }
     }
-
-}

@@ -3,196 +3,194 @@ using System.Collections;
 using System.ComponentModel;
 using UnityEngine.UI;
 using UnityEngine;
+using Weather;
 
-namespace Weather
+public class WeatherDayMore : MonoBehaviour
 {
-    public class WeatherDayMore : MonoBehaviour
+    [SerializeField]
+    private Text labelDay;
+    [SerializeField]
+    private Text labelInfo;
+    [SerializeField]
+    private Text labelTemp;
+    [SerializeField]
+    private Text labelWind1;
+    [SerializeField]
+    private Text labelWind2;
+    [SerializeField]
+    private RawImage pictureBoxWeather;
+    public void Awake()
     {
-        [SerializeField]
-        private Text labelDay;
-        [SerializeField]
-        private Text labelInfo;
-        [SerializeField]
-        private Text labelTemp;
-        [SerializeField]
-        private Text labelWind1;
-        [SerializeField]
-        private Text labelWind2;
-        [SerializeField]
-        private RawImage pictureBoxWeather;
-        public void Awake()
+        InitializeComponent();
+    }
+
+    private void InitializeComponent()
+    {
+
+    }
+
+    string day;
+    [Category("设置")]
+    [Description("设置或获得日期")]
+    [DefaultValue("")]
+    public string Day
+    {
+        set
         {
-            InitializeComponent();
+            this.day = value;
+            this.labelDay.text = this.day;
         }
-
-        private void InitializeComponent()
+        get
         {
-
+            return this.day;
         }
-
-        string day;
-        [Category("设置")]
-        [Description("设置或获得日期")]
-        [DefaultValue("")]
-        public string Day
+    }
+    string info;
+    [Category("设置")]
+    [Description("设置或获得天气信息")]
+    [DefaultValue("")]
+    public string Info
+    {
+        set
         {
-            set
-            {
-                this.day = value;
-                this.labelDay.text = this.day;
-            }
-            get
-            {
-                return this.day;
-            }
+            this.info = value;
+            this.labelInfo.text = this.info;
         }
-        string info;
-        [Category("设置")]
-        [Description("设置或获得天气信息")]
-        [DefaultValue("")]
-        public string Info
+        get
         {
-            set
-            {
-                this.info = value;
-                this.labelInfo.text = this.info;
-            }
-            get
-            {
-                return this.info;
-            }
+            return this.info;
         }
+    }
 
-        string temperature;
-        [Category("设置")]
-        [Description("设置或获得温度")]
-        public string Temperature
+    string temperature;
+    [Category("设置")]
+    [Description("设置或获得温度")]
+    public string Temperature
+    {
+        set
         {
-            set
-            {
-                this.temperature = value;
-                this.labelTemp.text = this.temperature;
-            }
-            get
-            {
-                return this.temperature;
-            }
+            this.temperature = value;
+            this.labelTemp.text = this.temperature;
         }
-
-
-        string wind1;
-
-        [Category("设置")]
-        [Description("设置或获得风级1")]
-        [DefaultValue("")]
-        public string Wind1
+        get
         {
-            set
-            {
-                this.wind1 = value;
-                this.labelWind1.text = this.wind1;
-            }
-            get
-            {
-                return this.wind1;
-            }
+            return this.temperature;
         }
+    }
 
-        string wind2;
-        [Category("设置")]
-        [Description("设置或获得风级2")]
-        [DefaultValue("")]
-        public string Wind2
+
+    string wind1;
+
+    [Category("设置")]
+    [Description("设置或获得风级1")]
+    [DefaultValue("")]
+    public string Wind1
+    {
+        set
         {
-            set
-            {
-                this.wind2 = value;
-                this.labelWind2.text = this.wind2;
-            }
-            get
-            {
-                return this.wind2;
-            }
+            this.wind1 = value;
+            this.labelWind1.text = this.wind1;
         }
-
-        WeatherStatus status = WeatherStatus.Weizhi;
-        [Category("设置")]
-        [Description("设置或获得天气图标")]
-        [DefaultValue(WeatherStatus.Weizhi)]
-        public WeatherStatus WeatherStatus
+        get
         {
-            set
-            {
-                this.status = value;
-                StartCoroutine(ChargePicture( pictureBoxWeather, this.GetSmallWeatherStatusString(this.status)));
-            }
-            get
-            {
-                return this.status;
-            }
+            return this.wind1;
         }
+    }
 
-        string GetSmallWeatherStatusString(WeatherStatus weatherStatus)
+    string wind2;
+    [Category("设置")]
+    [Description("设置或获得风级2")]
+    [DefaultValue("")]
+    public string Wind2
+    {
+        set
         {
-            string url = "http://www.webxml.com.cn/images/weather/";
-            switch (weatherStatus)
-            {
-                case WeatherStatus.Weizhi: url += "nothing.gif"; break;
-                case WeatherStatus.Qing: url += "0.gif"; break;
-                case WeatherStatus.Duoyun: url += "1.gif"; break;
-                case WeatherStatus.Yin: url += "2.gif"; break;
-                case WeatherStatus.Zhenyu: url += "3.gif"; break;
-                case WeatherStatus.Leizhenyu: url += "4.gif"; break;
-                case WeatherStatus.LeizhenyuBingpao: url += "5.gif"; break;
-                case WeatherStatus.Yujiaxue: url += "6.gif"; break;
-                case WeatherStatus.Xiaoyu: url += "7.gif"; break;
-                case WeatherStatus.Zhongyu: url += "8.gif"; break;
-                case WeatherStatus.Dayu: url += "9.gif"; break;
-                case WeatherStatus.Baoyu: url += "10.gif"; break;
-                case WeatherStatus.Dabaoyu: url += "11.gif"; break;
-                case WeatherStatus.Tedabaoyu: url += "12.gif"; break;
-                case WeatherStatus.Zhenxue: url += "13.gif"; break;
-                case WeatherStatus.Xiaoxue: url += "14.gif"; break;
-                case WeatherStatus.Zhongxue: url += "15.gif"; break;
-                case WeatherStatus.Daxue: url += "16.gif"; break;
-                case WeatherStatus.Baoxue: url += "17.gif"; break;
-                case WeatherStatus.Wu: url += "18.gif"; break;
-                case WeatherStatus.Dongyu: url += "19.gif"; break;
-                case WeatherStatus.Shachenbao: url += "20.gif"; break;
-                case WeatherStatus.XiaoyuZhuangZhongyu: url += "21.gif"; break;
-                case WeatherStatus.ZhongyuZhuangDayu: url += "22.gif"; break;
-                case WeatherStatus.DayuZhuangBaoyu: url += "23.gif"; break;
-                case WeatherStatus.BaoyuZhuangDabaoyu: url += "24.gif"; break;
-                case WeatherStatus.DabaoyuZhuangTedabaoyu: url += "25.gif"; break;
-                case WeatherStatus.XiaoxueZhuangZhongxue: url += "26.gif"; break;
-                case WeatherStatus.ZhongxueZhuangDaxue: url += "27.gif"; break;
-                case WeatherStatus.DaxueZhuangBaoxue: url += "28.gif"; break;
-                case WeatherStatus.Fuchen: url += "29.gif"; break;
-                case WeatherStatus.Yasha: url += "30.gif"; break;
-                case WeatherStatus.Qiangshachenbao: url += "31.gif"; break;
-                case WeatherStatus.Xiaodaozhongyu: url += "21.gif"; break;
-                case WeatherStatus.Zhongdaodayu: url += "22.gif"; break;
-                case WeatherStatus.Dadaobaoyu: url += "23.gif"; break;
-                case WeatherStatus.Xiaodaozhongxue: url += "26.gif"; break;
-                case WeatherStatus.Zhongdaodaxue: url += "27.gif"; break;
-                case WeatherStatus.Dadaobaoxue: url += "28.gif"; break;
-                case WeatherStatus.Xiaozhenyu: url += "3.gif"; break;
-                case WeatherStatus.Yintian: url += "2.gif"; break;
-                case WeatherStatus.Mai: url += "18.gif"; break;
-                case WeatherStatus.Wumai: url += "18.gif"; break;
-                default: url += "nothing.gif"; break;
-            }
-            return url;
+            this.wind2 = value;
+            this.labelWind2.text = this.wind2;
         }
-
-        IEnumerator ChargePicture(RawImage image,string url)
+        get
         {
-            WWW www = new WWW(url);
-            yield return url;
-            if(www.error != null)
-            {
-                image.texture = www.texture;
-            }
+            return this.wind2;
+        }
+    }
+
+    WeatherStatus status = WeatherStatus.Weizhi;
+    [Category("设置")]
+    [Description("设置或获得天气图标")]
+    [DefaultValue(WeatherStatus.Weizhi)]
+    public WeatherStatus WeatherStatus
+    {
+        set
+        {
+            this.status = value;
+            StartCoroutine(ChargePicture(pictureBoxWeather, this.GetSmallWeatherStatusString(this.status)));
+        }
+        get
+        {
+            return this.status;
+        }
+    }
+
+    string GetSmallWeatherStatusString(WeatherStatus weatherStatus)
+    {
+        string url = "http://www.webxml.com.cn/images/weather/";
+        switch (weatherStatus)
+        {
+            case WeatherStatus.Weizhi: url += "nothing.gif"; break;
+            case WeatherStatus.Qing: url += "0.gif"; break;
+            case WeatherStatus.Duoyun: url += "1.gif"; break;
+            case WeatherStatus.Yin: url += "2.gif"; break;
+            case WeatherStatus.Zhenyu: url += "3.gif"; break;
+            case WeatherStatus.Leizhenyu: url += "4.gif"; break;
+            case WeatherStatus.LeizhenyuBingpao: url += "5.gif"; break;
+            case WeatherStatus.Yujiaxue: url += "6.gif"; break;
+            case WeatherStatus.Xiaoyu: url += "7.gif"; break;
+            case WeatherStatus.Zhongyu: url += "8.gif"; break;
+            case WeatherStatus.Dayu: url += "9.gif"; break;
+            case WeatherStatus.Baoyu: url += "10.gif"; break;
+            case WeatherStatus.Dabaoyu: url += "11.gif"; break;
+            case WeatherStatus.Tedabaoyu: url += "12.gif"; break;
+            case WeatherStatus.Zhenxue: url += "13.gif"; break;
+            case WeatherStatus.Xiaoxue: url += "14.gif"; break;
+            case WeatherStatus.Zhongxue: url += "15.gif"; break;
+            case WeatherStatus.Daxue: url += "16.gif"; break;
+            case WeatherStatus.Baoxue: url += "17.gif"; break;
+            case WeatherStatus.Wu: url += "18.gif"; break;
+            case WeatherStatus.Dongyu: url += "19.gif"; break;
+            case WeatherStatus.Shachenbao: url += "20.gif"; break;
+            case WeatherStatus.XiaoyuZhuangZhongyu: url += "21.gif"; break;
+            case WeatherStatus.ZhongyuZhuangDayu: url += "22.gif"; break;
+            case WeatherStatus.DayuZhuangBaoyu: url += "23.gif"; break;
+            case WeatherStatus.BaoyuZhuangDabaoyu: url += "24.gif"; break;
+            case WeatherStatus.DabaoyuZhuangTedabaoyu: url += "25.gif"; break;
+            case WeatherStatus.XiaoxueZhuangZhongxue: url += "26.gif"; break;
+            case WeatherStatus.ZhongxueZhuangDaxue: url += "27.gif"; break;
+            case WeatherStatus.DaxueZhuangBaoxue: url += "28.gif"; break;
+            case WeatherStatus.Fuchen: url += "29.gif"; break;
+            case WeatherStatus.Yasha: url += "30.gif"; break;
+            case WeatherStatus.Qiangshachenbao: url += "31.gif"; break;
+            case WeatherStatus.Xiaodaozhongyu: url += "21.gif"; break;
+            case WeatherStatus.Zhongdaodayu: url += "22.gif"; break;
+            case WeatherStatus.Dadaobaoyu: url += "23.gif"; break;
+            case WeatherStatus.Xiaodaozhongxue: url += "26.gif"; break;
+            case WeatherStatus.Zhongdaodaxue: url += "27.gif"; break;
+            case WeatherStatus.Dadaobaoxue: url += "28.gif"; break;
+            case WeatherStatus.Xiaozhenyu: url += "3.gif"; break;
+            case WeatherStatus.Yintian: url += "2.gif"; break;
+            case WeatherStatus.Mai: url += "18.gif"; break;
+            case WeatherStatus.Wumai: url += "18.gif"; break;
+            default: url += "nothing.gif"; break;
+        }
+        return url;
+    }
+
+    IEnumerator ChargePicture(RawImage image, string url)
+    {
+        WWW www = new WWW(url);
+        yield return url;
+        if (www.error != null)
+        {
+            image.texture = www.texture;
         }
     }
 }

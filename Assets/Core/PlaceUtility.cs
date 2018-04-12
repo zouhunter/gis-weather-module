@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Weather
 {
-    class Place
+    public class PlaceUtility
     {
         public static PlaceModel[] GetProvinces()
         {
@@ -61,22 +61,5 @@ namespace Weather
         }
     }
 
-    public class PlaceModel
-    {
-        public string ID { set; get; }
-        public string Name { set; get; }
-
-        public override bool Equals(object obj)
-        {
-            PlaceModel pm = (PlaceModel)obj;
-            if (this.ID == pm.ID && this.Name == pm.Name)
-                return true;
-            return false;
-        }
-        public override int GetHashCode()
-        {
-            return (this.ID + this.Name).GetHashCode();
-        }
-
-    }
+   
 }
