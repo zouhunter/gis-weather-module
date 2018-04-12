@@ -15,7 +15,7 @@ namespace Weather
                 if (_asyncBehaiver == null || _asyncBehaiver.death)
                 {
                     var go = new GameObject("AsyncBehaiver");
-                    return go.AddComponent<AsyncBehaiver>();
+                    _asyncBehaiver = go.AddComponent<AsyncBehaiver>();
                 }
                 return _asyncBehaiver;
             }

@@ -19,6 +19,7 @@ public class PrintTest : MonoBehaviour
             Sync();
         }
     }
+
     void Sync()
     {
         var provinces = PlaceUtility.GetProvinces();

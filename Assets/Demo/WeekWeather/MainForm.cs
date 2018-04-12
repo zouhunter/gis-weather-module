@@ -220,8 +220,6 @@ public class MainForm : MonoBehaviour
                 ThreadPool.QueueUserWorkItem((x) =>
                 {
                     WeekWeatherAnalysis detail = this.Search(province, city, district);
-                    Debug.Log(detail);
-                    Debug.Log(detail.city);
                     this.InvokeToForm(new Action(() =>
                     {
                         if (detail != null)
@@ -268,7 +266,7 @@ public class MainForm : MonoBehaviour
 
     private WeekWeatherAnalysis Search(PlaceModel province, PlaceModel city, PlaceModel district)
     {
-        WeekWeatherAnalysis detail = new WeekWeatherAnalysis(province, city, district);
+        WeekWeatherAnalysis detail = new WeekWeatherAnalysis(province.ID, city.ID, district.ID);
         detail.HandleWeather();
         return detail;
     }
