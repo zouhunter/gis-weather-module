@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System;
 using System.ComponentModel;
 
-using Weather;
+using Weather_com;
 
 [DefaultProperty("Day")]
     public class WeatherDay : MonoBehaviour

@@ -3,7 +3,7 @@ using System.Collections;
 using System.ComponentModel;
 using UnityEngine.UI;
 using UnityEngine;
-using Weather;
+using Weather_com;
 
 public class WeatherDayMore : MonoBehaviour
 {
